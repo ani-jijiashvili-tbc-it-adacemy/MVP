@@ -38,14 +38,13 @@
       />
 
       <p-select
-        [options]="categoryOptions()"
-        [(ngModel)]="selectedCategory"
-        optionLabel="name"
-        optionValue="id"
-        placeholder="All Categories"
-        styleClass="filter-select"
-        (onChange)="onCategoryChange($event.value)"
-      />
+  [options]="categoryOptions()"
+  [(ngModel)]="selectedCategory"
+  optionLabel="name"
+  optionValue="id"
+  placeholder="All Categories"
+  styleClass="filter-select"
+/>
       <p-select
   [options]="sortOrderOptions"
   [(ngModel)]="sortOrder"

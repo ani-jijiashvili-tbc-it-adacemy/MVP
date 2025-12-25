@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
@@ -80,23 +80,30 @@ export class EventManagementPage implements OnInit, OnDestroy {
     this.loadCategories();
     this.loadEvents();
   }
-
-  loadCategories(): void {
-    this.adminEventService.getCategories()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (categories: EventType[]) => {
-          this.categoryOptions.set([
-            { id: null, name: 'All Categories' },
-            ...categories.map((cat: EventType) => ({ id: cat.id, name: cat.name }))
-          ]);
-        },
-        error: (err) => {
-          console.error('Failed to load categories', err);
-        }
-      });
+  constructor(){
+    effect(() => {
+    const category = this.selectedCategory();
+    this.currentPage.set(1);
+    this.loadEvents();
+  });
   }
 
+private loadCategories(): void {
+  this.adminEventService.getCategories()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (categories) => {
+        const options = [
+          { id: null, name: 'All Categories' },
+          ...categories.map(cat => ({ id: cat.id, name: cat.name }))
+        ];
+        this.categoryOptions.set(options);
+      },
+      error: (err) => {
+        console.error('Failed to load categories', err);
+      }
+    });
+}
   loadEvents(): void {
     this.isLoading.set(true);
     this.error.set(null);

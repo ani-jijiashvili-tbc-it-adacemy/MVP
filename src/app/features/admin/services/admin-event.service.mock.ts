@@ -31,7 +31,6 @@ export class AdminEventMock {
     globalMockEvents = events;
   }
 
-  // ✅ ADD THIS METHOD
   getCategories(): Observable<EventType[]> {
     const categories: EventType[] = [
       { id: 1, name: 'Team Building' },

@@ -11,6 +11,8 @@ import {
   EventsResponse,
   EventFilters,
   EventType,
+  Category,
+  CategoriesResponse,
 } from '../models/admin-event.model';
 import {
   CreateEventRequest,
@@ -46,15 +48,11 @@ export class AdminEvent {
     );
   }
 
-  getCategories(): Observable<EventType[]> {
-    return this.http.get<CategoryApiResponse[]>(
+  getCategories(): Observable<Category[]> {
+    return this.http.get<CategoriesResponse>(
       `${this.baseUrl}${API_ENDPOINTS.EVENTS.CATEGORIES}`
     ).pipe(
-      map((categories: CategoryApiResponse[]) => 
-        categories.map((cat: CategoryApiResponse): EventType => ({
-          id: cat.id,
-          name: cat.name
-        }))
+      map(response=>response.categories
       )
     );
   }

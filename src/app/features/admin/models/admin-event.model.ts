@@ -1,4 +1,4 @@
-import { AgendaItem, FAQ, Speaker } from "./event-form.model";
+import { AgendaItem, FAQ, Speaker } from './event-form.model';
 
 export interface AdminEventList {
   id: number;
@@ -16,8 +16,8 @@ export interface AdminEventList {
   tags: string[];
   createdBy: EventOrganizer;
   createdAt: string;
-   agenda?: AgendaItem[];  
-  speakers?: Speaker[];  
+  agenda?: AgendaItem[];
+  speakers?: Speaker[];
   faqs?: FAQ[];
 }
 
@@ -58,7 +58,7 @@ export interface EventFilters {
   search?: string;
   status?: EventStatus;
   categories?: number[];
-    sortOrder?: 'newest' | 'oldest'; 
+  sortOrder?: 'newest' | 'oldest';
 
   page: number;
   pageSize: number;
@@ -71,16 +71,26 @@ export interface EventsResponse {
 
 export const SORT_ORDER_OPTIONS = [
   { label: 'Newest First', value: 'newest' as const },
-  { label: 'Oldest First', value: 'oldest' as const }
+  { label: 'Oldest First', value: 'oldest' as const },
 ];
 
 export const STATUS_OPTIONS = [
   { label: 'All Status', value: 'all' as const },
   { label: 'Upcoming', value: 'upcoming' as const },
   { label: 'Past', value: 'past' as const },
-  { label: 'Cancelled', value: 'cancelled' as const }
+  { label: 'Cancelled', value: 'cancelled' as const },
 ];
+export interface Category {
+  id: number;
+  name: string;
+  description: string;
+  isActive: boolean;
+  eventCount: number;
+}
 
+export interface CategoriesResponse {
+  categories: Category[];
+}
 // export const CATEGORY_OPTIONS = [
 //   { id: null, name: 'All Categories' },
 //   { id: 1, name: 'Team Building' },
