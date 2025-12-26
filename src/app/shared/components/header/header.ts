@@ -16,7 +16,7 @@ export class Header {
   readonly userRole = computed(() => this.authService.user()?.role || '');
   readonly userAvatar = signal('https://static.thenounproject.com/png/363640-200.png');
   readonly isOrganizer = computed(() => checkIsOrganizer(this.authService.user()));
-  readonly notificationCount = signal(3);
+  readonly notificationCount = signal("0");
   readonly mobileMenuOpen = signal<boolean>(false);
 
   toggleMobileMenu(): void {

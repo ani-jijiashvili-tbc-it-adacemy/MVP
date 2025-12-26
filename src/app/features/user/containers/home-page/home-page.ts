@@ -31,7 +31,7 @@ export class HomePageComponent implements OnInit {
   readonly loading = signal(true);
   readonly selectedDate = signal<Date>(new Date());
 
-  readonly userName = signal('Sarah');
+  readonly userName = signal('dear');
 
   readonly eventDates = computed(() => {
     return this.upcomingEvents()
