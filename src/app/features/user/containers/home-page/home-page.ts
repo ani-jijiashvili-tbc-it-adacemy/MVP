@@ -48,8 +48,9 @@ export class HomePageComponent implements OnInit {
     this.loading.set(true);
     this.eventService.getEvents({ page: 1, pageSize: 4 }).subscribe({
       next: (response) => {
-        this.upcomingEvents.set(response.data);
+        this.upcomingEvents.set(response.items);
         this.loading.set(false);
+        console.log(response.items)
       },
       error: (error) => {
         console.error('Error loading events:', error);
@@ -57,6 +58,8 @@ export class HomePageComponent implements OnInit {
       },
     });
   }
+
+  
 
   loadCategories(): void {
     this.eventService.getCategories().subscribe({

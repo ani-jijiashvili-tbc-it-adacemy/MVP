@@ -1,6 +1,9 @@
 export interface EventType {
-  id: number;
+   id: number;
   name: string;
+  description?: string;
+  isActive?: boolean;
+  eventCount?: number;
 }
 
 export interface EventListItem {
@@ -46,10 +49,13 @@ export interface EventDetail extends EventListItem {
 }
 
 export interface EventsResponse {
-  data: EventListItem[];
-  total: number;
-  page: number;
+  items: EventListItem[];  
+  totalCount: number;      
+  pageNumber: number;     
   pageSize: number;
+  totalPages: number;
+  hasPrevious: boolean;
+  hasNext: boolean;
 }
 
 export interface EventCategory {

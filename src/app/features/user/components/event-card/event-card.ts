@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { EventListItem } from '../../models/event.model';
@@ -12,7 +12,7 @@ import { EventListItem } from '../../models/event.model';
 export class EventCardComponent {
   readonly event = input.required<EventListItem>();
   readonly registerClick = output<number>();
-
+ protected eventData = computed(() => this.event());
   onRegisterClick(eventId: number): void {
     this.registerClick.emit(eventId);
   }
@@ -23,6 +23,7 @@ export class EventCardComponent {
     if (percentage >= 70) return 'limited';
     return 'available';
   }
+
 
   getCapacityClass(): string {
     const status = this.getCapacityStatus();

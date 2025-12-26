@@ -180,11 +180,14 @@ getEvents(filters: EventFilters): Observable<EventsResponse> {
   const end = start + filters.pageSize;
   const paginatedEvents = filteredEvents.slice(start, end);
 
-  return of({
-    data: paginatedEvents,
-    total,
-    page: filters.page,
+ return of({
+    items: paginatedEvents,
+    totalCount: total,
+    pageNumber: filters.page,
     pageSize: filters.pageSize,
+    totalPages: Math.ceil(total / filters.pageSize),
+    hasPrevious: filters.page > 1,
+    hasNext: filters.page < Math.ceil(total / filters.pageSize)
   }).pipe(delay(500));
 }
 
