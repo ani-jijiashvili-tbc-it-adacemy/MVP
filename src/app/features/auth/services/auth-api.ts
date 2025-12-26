@@ -48,19 +48,19 @@ export class AuthApi {
     );
   }
 
-  sendOtp(phone: string): Observable<void> {
-    return this.http.post<void>(
+  sendOtp(email: string): Observable<string> {
+    return this.http.post(
       `${this.baseUrl}${API_ENDPOINTS.AUTH.SEND_OTP}`,
-      phone,
-      { headers: { 'Content-Type': 'application/json' } }
+      { email },
+      { responseType: 'text' }
     );
   }
 
-  verifyOtp(otp: string): Observable<{ verified: boolean }> {
-    return this.http.post<{ verified: boolean }>(
+  verifyOtp(email: string, otpCode: string): Observable<string> {
+    return this.http.post(
       `${this.baseUrl}${API_ENDPOINTS.AUTH.VERIFY_OTP}`,
-      otp,
-      { headers: { 'Content-Type': 'application/json' } }
+      { email, otpCode },
+      { responseType: 'text' }
     );
   }
 }

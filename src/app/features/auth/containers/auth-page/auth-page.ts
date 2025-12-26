@@ -24,6 +24,7 @@ import { AuthService } from '../../../../core/service/auth';
 import { environment } from '../../../../../environments/environment';
 import { AuthMock } from '../../services/auth-mock';
 import { isOrganizer } from '../../../../shared/models/user.model';
+
 @Component({
   selector: 'app-auth-page',
   imports: [CommonModule, SignInForm, SignUpForm, ForgotPasswordForm],
@@ -68,8 +69,6 @@ export class AuthPage implements OnInit {
     } else {
       this.currentView.set('sign-in');
     }
-
-    
   }
 
   onLogin(request: LoginRequest): void {
@@ -81,18 +80,11 @@ export class AuthPage implements OnInit {
           request.rememberMe
         );
         this.signInForm()?.setStatus('success');
-         if (isOrganizer(response.user)) {
-        this.router.navigate(['/admin/events']);
-      } else {
-        this.router.navigate(['/user/events']);
-      }
-
-        // if (response.user.role === 'organizer') {
-        //   this.router.navigate(['/admin/events']);
-        // } else {
-        //   this.router.navigate(['/user/events']);
-        //   console.log(response);
-        // }
+        if (isOrganizer(response.user)) {
+          this.router.navigate(['/admin/events']);
+        } else {
+          this.router.navigate(['/user/events']);
+        }
       },
       error: (error: HttpErrorResponse) => {
         const errorMessage = this.extractErrorMessage(error);
@@ -106,7 +98,6 @@ export class AuthPage implements OnInit {
       next: (response) => {
         this.authService.setAuth(response.token, response.user);
         this.signUpForm()?.setStatus('success');
-        console.log(response)
 
         if (response.user.role === 'organizer') {
           this.router.navigate(['/admin/events']);
@@ -133,27 +124,38 @@ export class AuthPage implements OnInit {
     });
   }
 
-  onSendOtp(phone: string): void {
-    this.authApiService.sendOtp(phone).subscribe({
-      next: () => {},
-     
-    });
-  }
-  onVerifyOtp(otp: string): void {
-    this.authApiService.verifyOtp(otp).subscribe({
-      next: (response) => {
-        if (response.verified) {
-          this.signUpForm()?.submitRegistration();
-        } else {
-          this.signUpForm()?.setError('Invalid OTP code');
-        }
-      },
-      error: (err) => {
-        console.error('Verify OTP error:', err);
-        this.signUpForm()?.setError('Failed to verify OTP. Try again.');
-      },
-    });
-  }
+onSendOtp(email: string): void {
+  this.authApiService.sendOtp(email).subscribe({
+    next: () => {
+      this.signUpForm()?.setStatus('idle');
+    },
+    error: (error: HttpErrorResponse) => {
+      const errorMessage = this.extractErrorMessage(error);
+      this.signUpForm()?.setError(errorMessage);
+    },
+  });
+}
+
+onVerifyOtp(data: string): void {
+  const { email, otp } = JSON.parse(data);
+  console.log('Calling verifyOtp with:', { email, otp });
+  
+  this.authApiService.verifyOtp(email, otp).subscribe({
+    next: (response) => {
+      console.log('Verify OTP Response:', response);
+      console.log('Calling submitRegistration...');
+      
+      this.signUpForm()?.setStatus('idle');
+      this.signUpForm()?.submitRegistration();
+    },
+    error: (error: HttpErrorResponse) => {
+      console.error('Verify OTP error:', error);
+      const errorMessage = this.extractErrorMessage(error);
+      this.signUpForm()?.setError(errorMessage);
+    },
+  });
+}
+
   onNavigateToSignIn(): void {
     this.router.navigate(['/signIn']);
   }

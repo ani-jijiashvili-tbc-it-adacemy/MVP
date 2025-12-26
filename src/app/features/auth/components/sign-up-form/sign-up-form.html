@@ -52,33 +52,15 @@
 
     <div class="form-field">
       <label for="email">Email</label>
-      <input
-        id="email"
-        type="email"
-        pInputText
-        formControlName="email"
-        placeholder="Enter your email"
-        (blur)="onFieldBlur('email')"
-        [class.invalid]="hasFieldError('email')"
-      />
-      @if (hasFieldError('email')) {
-      <small class="error-text">
-        {{ form.controls.email.errors | formError }}
-      </small>
-      }
-    </div>
-
-    <div class="form-field">
-      <label for="phone">Phone Number</label>
       <div class="phone-input-group">
         <input
-          id="phone"
-          type="tel"
+          id="email"
+          type="email"
           pInputText
-          formControlName="phone"
-          placeholder="+995 555 55 55 55"
-          (blur)="onFieldBlur('phone')"
-          [class.invalid]="hasFieldError('phone')"
+          formControlName="email"
+          placeholder="Enter your email"
+          (blur)="onFieldBlur('email')"
+          [class.invalid]="hasFieldError('email')"
         />
         <button
           type="button"
@@ -89,9 +71,9 @@
           class="otp-button"
         ></button>
       </div>
-      @if (hasFieldError('phone')) {
+      @if (hasFieldError('email')) {
       <small class="error-text">
-        {{ form.controls.phone.errors | formError }}
+        {{ form.controls.email.errors | formError }}
       </small>
       }
     </div>
@@ -100,7 +82,7 @@
     <div class="form-field">
       <label for="otp">
         <i class="pi pi-shield"></i>
-        Enter OTP Code
+        Enter OTP Code (sent to your email)
       </label>
       <div class="otp-input-container">
         <input
@@ -125,6 +107,24 @@
       </button>
     </div>
     }
+
+    <div class="form-field">
+      <label for="phone">Phone Number</label>
+      <input
+        id="phone"
+        type="tel"
+        pInputText
+        formControlName="phone"
+        placeholder="+995 555 55 55 55"
+        (blur)="onFieldBlur('phone')"
+        [class.invalid]="hasFieldError('phone')"
+      />
+      @if (hasFieldError('phone')) {
+      <small class="error-text">
+        {{ form.controls.phone.errors | formError }}
+      </small>
+      }
+    </div>
 
     <div class="form-field">
       <label for="department">Department</label>

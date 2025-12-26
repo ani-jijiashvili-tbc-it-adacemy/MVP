@@ -39,7 +39,7 @@ setAuth(token: string, user: User, rememberMe: boolean = false): void {
 
   logout(): void {
     this.clearAuth();
-    this.router.navigate(['/sign-in']);
+    this.router.navigate(['/signin']);
   }
 
   private loadFromStorage(): void {

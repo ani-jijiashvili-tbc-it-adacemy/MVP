@@ -46,19 +46,26 @@ export class SignUpForm implements OnInit {
   readonly navigateToSignIn = output<void>();
   readonly sendOtp = output<string>();
   readonly submitForm = output<RegisterRequest>();
-readonly verifyOtp = output<string>(); 
+  readonly verifyOtp = output<string>();
 
   readonly status = signal<FormStatus>('idle');
   readonly errorMessage = signal<string | null>(null);
   readonly otpSent = signal(false);
   readonly otpTimer = signal(300);
   readonly phoneValid = signal(false);
+  readonly emailValid = signal(false);
 
   readonly isLoading = computed(() => this.status() === 'loading');
   readonly hasError = computed(() => this.status() === 'error');
-  readonly canSendOtp = computed(() => this.phoneValid() && !this.otpSent());
+  readonly canSendOtp = computed(
+    () => this.phoneValid() && this.emailValid() && !this.otpSent()
+  );
   readonly formValid = signal(false);
-  readonly isDisabled = computed(() => this.isLoading() || !this.formValid());
+  readonly isDisabled = computed(() => {
+    if (this.isLoading()) return true;
+    if (!this.otpSent()) return true;
+    return !this.formValid();
+  });
   readonly otpTimerDisplay = computed(() => {
     const seconds = this.otpTimer();
     const mins = Math.floor(seconds / 60);
@@ -92,15 +99,11 @@ readonly verifyOtp = output<string>();
       }),
       phone: new FormControl('', {
         nonNullable: true,
-        validators: [Validators.required, CustomValidators.phone()],
+        validators: [Validators.required],
       }),
       otp: new FormControl('', {
         nonNullable: true,
-        validators: [
-          Validators.required,
-          Validators.minLength(6),
-          Validators.maxLength(6),
-        ],
+        validators: [],
       }),
       department: new FormControl<Department | null>(null, {
         validators: [Validators.required],
@@ -138,16 +141,34 @@ readonly verifyOtp = output<string>();
         this.stopOtpTimer();
       }
     });
+
+    effect(() => {
+      if (this.otpSent()) {
+        this.form.controls.otp.setValidators([
+          Validators.required,
+          Validators.minLength(6),
+          Validators.maxLength(6),
+        ]);
+      } else {
+        this.form.controls.otp.clearValidators();
+      }
+      this.form.controls.otp.updateValueAndValidity();
+    });
+
     this.form.controls.phone.statusChanges.subscribe(() => {
       this.phoneValid.set(this.form.controls.phone.valid);
     });
+
+    this.form.controls.email.statusChanges.subscribe(() => {
+      this.emailValid.set(this.form.controls.email.valid);
+    });
+
     this.form.statusChanges.subscribe(() => {
       this.formValid.set(this.form.valid);
     });
   }
-  ngOnInit(): void {
 
-  }
+  ngOnInit(): void {}
 
   isFieldTouched(fieldName: string): boolean {
     return this.touchedFields().has(fieldName);
@@ -171,73 +192,65 @@ readonly verifyOtp = output<string>();
   }
 
   onSendOtp(): void {
+    const email = this.form.controls.email.value;
     const phone = this.form.controls.phone.value;
+
+    if (!email || this.form.controls.email.invalid) {
+      this.onFieldBlur('email');
+      return;
+    }
+
     if (!phone || this.form.controls.phone.invalid) {
       this.onFieldBlur('phone');
       return;
     }
 
-    this.sendOtp.emit(phone);
+    this.sendOtp.emit(email);
     this.otpSent.set(true);
     this.startOtpTimer();
   }
 
   onResendOtp(): void {
-    const phone = this.form.controls.phone.value;
-    if (phone) {
-      this.sendOtp.emit(phone);
+    const email = this.form.controls.email.value;
+    if (email) {
+      this.sendOtp.emit(email);
       this.otpTimer.set(300);
       this.startOtpTimer();
     }
   }
 
-  // onSubmit(): void {
-  //   if (this.form.invalid) {
-  //     Object.keys(this.form.controls).forEach((key) => {
-  //       this.onFieldBlur(key);
-  //     });
-  //     return;
-  //   }
+  onSubmit(): void {
+    if (this.form.invalid) {
+      Object.keys(this.form.controls).forEach((key) => this.onFieldBlur(key));
+      return;
+    }
 
-  //   const formValue = this.form.getRawValue();
-  //   this.status.set('loading');
-  //   this.errorMessage.set(null);
+    const formValue = this.form.getRawValue();
+    this.status.set('loading');
 
-  //   this.submitForm.emit({
-  //     firstName: formValue.firstName,
-  //     lastName: formValue.lastName,
-  //     email: formValue.email,
-  //     phone: formValue.phone,
-  //     department: formValue.department ? [formValue.department] : [],
-  //     password: formValue.password,
-  //   });
-  // }
-
-
-onSubmit(): void {
-  if (this.form.invalid) {
-    Object.keys(this.form.controls).forEach(key => this.onFieldBlur(key));
-    return;
+    this.verifyOtp.emit(
+      JSON.stringify({ email: formValue.email, otp: formValue.otp })
+    );
   }
 
-  const formValue = this.form.getRawValue();
-  this.status.set('loading');
-  
-  this.verifyOtp.emit(formValue.otp);
-}
+  submitRegistration(): void {
+    console.log('submitRegistration called');
+    const formValue = this.form.getRawValue();
 
-submitRegistration(): void {
-  const formValue = this.form.getRawValue();
-  
-  this.submitForm.emit({
-    firstName: formValue.firstName,
-    lastName: formValue.lastName,
-    email: formValue.email,
-    phone: formValue.phone,
-    department: formValue.department ? [formValue.department] : [],
-    password: formValue.password,
-  });
-}
+    console.log('Form value:', formValue);
+
+    const registerData = {
+      firstName: formValue.firstName,
+      lastName: formValue.lastName,
+      email: formValue.email,
+      phone: formValue.phone,
+      department: formValue.department?.name || '',
+      password: formValue.password,
+    };
+
+    console.log('Emitting submitForm with:', registerData);
+    this.submitForm.emit(registerData);
+  }
 
   onSignInClick(): void {
     this.navigateToSignIn.emit();
@@ -245,6 +258,9 @@ submitRegistration(): void {
 
   setStatus(status: FormStatus): void {
     this.status.set(status);
+    if (status === 'idle' || status === 'success') {
+      this.errorMessage.set(null);
+    }
   }
 
   setError(message: string): void {
@@ -272,5 +288,4 @@ submitRegistration(): void {
       this.otpIntervalId = null;
     }
   }
- 
 }

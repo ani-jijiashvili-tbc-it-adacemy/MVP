@@ -1,3 +1,5 @@
+import { Department } from '../../../shared/models/user.model';
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -9,7 +11,7 @@ export interface RegisterRequest {
   lastName: string;
   email: string;
   phone: string;
-  department: Department[];
+  department: string;
   password: string;
 }
 
@@ -27,15 +29,6 @@ export interface SignUpRequest {
   lastName: string;
   email: string;
   phone: string;
-  department: Department[];
+  department: string;
   password: string;
-}
-
-export interface ForgotPasswordRequest {
-  email: string;
-}
-
-export interface Department {
-  id: number;
-  name: string;
 }

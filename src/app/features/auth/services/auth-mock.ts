@@ -61,7 +61,7 @@ export class AuthMock {
       email: request.email,
       password: request.password,
       role: 'employee' as const,
-      departmentId: request.department[0]?.id || 1,
+      departmentId: 1,
       phone: request.phone,
     };
 
@@ -103,12 +103,13 @@ export class AuthMock {
   getDepartments(): Observable<typeof MOCK_DEPARTMENTS> {
     return of(MOCK_DEPARTMENTS).pipe(delay(300));
   }
-  sendOtp(phone: string): Observable<void> {
-    console.log('Mock OTP:', phone);
-    return of(void 0).pipe(delay(1000));
-  }
 
-  verifyOtp(otp: string): Observable<{ verified: boolean }> {
-    return of({ verified: otp === '123456' }).pipe(delay(500));
-  }
+ sendOtp(email: string): Observable<string> {
+  console.log('Mock OTP sent to email:', email);
+  return of('OTP sent successfully').pipe(delay(1000));
+}
+verifyOtp(email: string, otpCode: string): Observable<string> {
+  console.log('Mock verify OTP:', email, otpCode);
+  return of('Email verified successfully.').pipe(delay(500));
+}
 }
